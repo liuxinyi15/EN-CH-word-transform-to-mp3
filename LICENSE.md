@@ -1,4 +1,4 @@
-Copyright (c) 2024 [Xinyi LIU].
+Copyright (c) 2024 **Xinyi LIU**.
 
 All rights reserved.
 
