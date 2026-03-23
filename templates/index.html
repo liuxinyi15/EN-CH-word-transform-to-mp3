@@ -2,37 +2,152 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>词汇听写音频生成器</title>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .hint {
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: normal;
+            display: block;
+            margin-top: 0.2rem;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+            color: #007bff;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
+
+<div class="container">
     <h1>词汇听写音频生成器</h1>
 
-        <form action="/generate" method="post" enctype="multipart/form-data">
-    <label>上传Excel 文件（如果有英文和中文，请写列名‘English’和‘Chinese’；若只有英文，请写列名‘English’）：</label>
-<input type="file" name="file" accept=".xlsx,.xls" required>
-<br><br>
+    <form id="uploadForm" action="/generate" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>上传 Excel 文件</label>
+            <span class="hint">必须包含列名：<strong>English</strong> (可选：Chinese)</span>
+            <input type="file" name="file" accept=".xlsx,.xls" required>
+        </div>
 
-<label>输入音频文件名（无需输入.mp3）：</label>
-<input type="text" name="filename" placeholder="请输入文件名" required>
-<br><br>
+        <div class="form-group">
+            <label>保存的文件名</label>
+            <input type="text" name="filename" placeholder="例如：Unit1_Words" required>
+        </div>
 
-<label>朗读速度（例如 -20% 表示慢 20%，+20% 表示快 20%，推荐输入-20%）：</label>
-<input type="text" name="rate" placeholder="例如 -20%" required>
-<br><br>
-<label>选择语音：</label>
-<select name="voice">
-    <option value="zh-CN-XiaoxiaoNeural">女声</option>
-    <option value="zh-CN-YunxiNeural">男声</option>
-</select>
-<br><br>
+        <div class="form-group">
+            <label>语速 (Rate)</label>
+            <span class="hint">推荐：-20% (稍慢)，+0% (正常)</span>
+            <input type="text" name="rate" value="-20%" required>
+        </div>
 
-<label>每组单词重复次数：</label>
-<input type="number" name="repeat" placeholder="例如 3" min="1" required>
-<br><br>
+        <div class="form-group">
+            <label>选择配音角色</label>
+            <select name="voice">
+                <option value="zh-CN-XiaoxiaoNeural">晓晓 (女声 - 推荐)</option>
+                <option value="zh-CN-YunxiNeural">云希 (男声)</option>
+                <option value="en-US-GuyNeural">英文男声 (适合纯英)</option>
+            </select>
+        </div>
 
-<button type="submit">生成并下载音频</button>
+        <div class="form-group">
+            <label>每组重复次数</label>
+            <input type="number" name="repeat" value="2" min="1" required>
+        </div>
 
-</form>
+        <button type="submit" id="submitBtn">开始生成并下载</button>
+        <div id="loading">正在合成音频，请稍候... (这可能需要几十秒)</div>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('uploadForm');
+    const btn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+
+    form.onsubmit = function() {
+        btn.disabled = true;
+        btn.innerText = '处理中...';
+        loading.style.display = 'block';
+        
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerText = '开始生成并下载';
+            loading.style.display = 'none';
+        }, 10000);
+    };
+</script>
 
 </body>
 </html>
